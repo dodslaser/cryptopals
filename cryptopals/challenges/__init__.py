@@ -1,7 +1,12 @@
+"""
+Base challenge and solution classes
+"""
+
 from base64 import b64decode
 from random import randint
 from hashlib import sha256
-from functools import singledispatchmethod
+from typing import Any
+
 
 class BaseChallenge:
     """
@@ -16,17 +21,12 @@ class BaseChallenge:
 
     def __init__(self) -> None:
         raise NotImplementedError
-    
-    @singledispatchmethod
-    def check(self, solution) -> bool:
+
+    def check(self, solution: Any) -> bool:
         """
         Check the if solution is valid for challenge
         """
         raise NotImplementedError
-    
-    @check.register
-    def _(self, solution: bytes) -> bool:
-        return self.hash(solution) == self.solution_hash
 
     @staticmethod
     def get_random_text() -> bytes:
@@ -35,14 +35,14 @@ class BaseChallenge:
         """
         enc = _corpus[randint(0, len(_corpus) - 1)]
         return b64decode(enc)
-    
+
     @staticmethod
     def hash(solution: bytes) -> bytes:
         """
         Hash the solution.
         """
         return sha256(solution).digest()
-    
+
     @staticmethod
     def get_random_bytes(n: int):
         """
@@ -63,16 +63,18 @@ class BaseSolution:
         cls.id = id
 
     def __init__(self):
-        """
-        Initialize the solution.
-        """
         raise NotImplementedError
-    
+
     def pretty(self) -> None:
         """
         Pretty print the solution.
         """
         raise NotImplementedError
+
+    @classmethod
+    def cli(cls, *args, **kwargs) -> None:
+        __doc__ = cls.__doc__
+        return cls.__init__(*args, **kwargs)
 
 
 _corpus = [

@@ -4,8 +4,8 @@ from cryptopals.ui import UI
 
 
 class Challenge(BaseChallenge, id=3):
-    """
-    Challenge 1: Single-byte XOR cipher
+    """Challenge 3
+    Single-byte XOR cipher
     """
     challenge: bytes
     solution_hash: bytes

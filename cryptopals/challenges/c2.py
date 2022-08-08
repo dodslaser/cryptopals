@@ -3,26 +3,20 @@ from cryptopals.ui import UI
 from typing import Tuple
 
 def xor_bytes(a: bytes, b: bytes) -> bytes:
-    """
-    XOR two bytes objects.
-    """
+    """XOR two bytes objects."""
     ai = int.from_bytes(a, byteorder="big")
     bi = int.from_bytes(b, byteorder="big") 
     return int.to_bytes(ai ^ bi, max(map(len, [a, b])), byteorder="big")
 
 
 class Challenge(BaseChallenge, id=2):
-    """
-    Challenge 1: Fixed XOR
+    """Challenge 2
+    Fixed XOR
     """
     challenge: Tuple[bytes, bytes]
     solution_hash: bytes
 
     def __init__(self) -> None:
-        """
-        Initialize the challenge.
-        """
-
         self.challenge = (
             Challenge.get_random_text().ljust(64, b"\x00")[:64],
             Challenge.get_random_text().ljust(64, b"\x00")[:64]

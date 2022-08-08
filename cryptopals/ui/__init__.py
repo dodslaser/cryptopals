@@ -1,6 +1,7 @@
 from functools import singledispatchmethod
 from rich import print, box
 from rich.table import Table, Column
+from typing import Dict, Tuple, List, Union
 
 import re
 
@@ -41,24 +42,30 @@ class UI:
         """
         View the hex and utf-8 representation of a byte string as a table.
         """
-        hex = "\n".join(
-            data[n : n + width].hex(" ")
-            for n in range(0, len(data), width)
-        )
-        utf8 = UI.hard_wrap(UI.sanitize(data.decode("utf-8", errors="replace")), width)
-
-        UI.table_view(data = {"Hex": (hex, width*3), "UTF-8": (utf8, width)})
+        UI.table_view(data = {"Hex": (data.hex(" "), width*3), "ASCII": (data, width)})
 
     @staticmethod
-    def table_view(data: dict[str, tuple[str, int]]) -> None:
+    def table_view(data: Dict[str, Union[str, bytes]], widths = List[int]) -> None:
+        print(max(map(len, (*data.values()))))
         table = Table(
             *(
-                Column(h, width=w, overflow="fold")
-                for h, (_, w) in data.items()
+                Column(h, width=w if w is not None else max(map(len, data.values())), overflow="fold")
+                for h, w in zip(data.keys(), widths)
             ),
             box=box.SIMPLE
         )
 
-        table.add_row(*(v for v, _ in data.values()))
+        for (r, w) in zip(zip(*data.values()), widths):
+            row = (UI.sanitize(c) for c in r)
+            row = (UI.hard_wrap(c, w) if w is not None else c for c in row)
+            table.add_row(*row)
 
         print(table)
+    
+    @staticmethod
+    def grid_view(data: List[List[str]]) -> None:
+        grid = Table.grid(padding=(0, 1), pad_edge=True)
+        for r in zip(*data):
+            grid.add_row(*r)
+
+        print(grid)
